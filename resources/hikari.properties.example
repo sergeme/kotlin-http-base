@@ -1,0 +1,7 @@
+//Rename to hikari.properties before build
+dataSourceClassName=org.postgresql.ds.PGSimpleDataSource
+dataSource.user=user
+dataSource.password=password
+dataSource.databaseName=dbname
+dataSource.portNumber=5432
+dataSource.serverName=localhost
