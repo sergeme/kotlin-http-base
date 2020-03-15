@@ -1,14 +1,17 @@
 package me.sersch.http.components.user
 
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import java.util.*
 import kotlin.collections.ArrayList
 
 class UserController {
+
+    constructor() {
+        transaction {
+            SchemaUtils.create (Users)
+        }
+    }
 
     fun getAll(): ArrayList<User> {
         val users: ArrayList<User> = arrayListOf()
@@ -31,34 +34,26 @@ class UserController {
     fun insert(user: UserDTO) {
         transaction {
             Users.insert {
-                it[id] = UUID.randomUUID()
-                it[mail] = user.mail
                 it[firstname] = user.firstName
                 it[lastname] = user.lastName
+                it[mail] = user.mail
+                it[hash] = user.hash
             }
         }
     }
 
-    fun update(user: UserDTO, id: UUID) {
+    fun update(user: UserDTO, id: EntityID<Int>) {
         transaction {
             Users.update({Users.id eq id}) {
-                it[mail] = user.mail
                 it[firstname] = user.firstName
                 it[lastname] = user.lastName
+                it[mail] = user.mail
+                it[hash] = user.hash
             }
         }
     }
 
-    fun updateHash(user: UserDTO, id: UUID) {
-        //Cryptozeug
-        transaction {
-            Users.update({Users.id eq id}) {
-                it[hash] = "asd"
-            }
-        }
-    }
-
-    fun delete(id: UUID) {
+    fun delete(id: EntityID<Int>) {
         transaction {
             Users.deleteWhere { Users.id eq id }
         }

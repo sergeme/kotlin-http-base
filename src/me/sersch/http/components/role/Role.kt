@@ -1,4 +1,8 @@
 package me.sersch.http.components.role
 
-class Role {
-}
+import java.util.*
+
+data class Role (
+    override val id: UUID = UUID.randomUUID(),
+    override val name: String
+    ):RoleInterface

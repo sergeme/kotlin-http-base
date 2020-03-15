@@ -1,5 +1,6 @@
 package me.sersch.http.config
 
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.auth.Authentication
@@ -9,6 +10,7 @@ import io.ktor.features.StatusPages
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.jackson.jackson
 import io.ktor.serialization.DefaultJsonConfiguration
 import io.ktor.serialization.serialization
 import kotlinx.serialization.json.Json
@@ -29,13 +31,8 @@ fun Application.installFeatures() {
     }
 
     install(ContentNegotiation) {
-        serialization(
-            contentType = ContentType.Application.Json,
-            json = Json(
-                DefaultJsonConfiguration.copy(
-                    prettyPrint = true
-                )
-            )
-        )
+        jackson {
+            enable(SerializationFeature.INDENT_OUTPUT)
+        }
     }
 }

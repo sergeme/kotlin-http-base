@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.Database
 
 fun initDB() {
     val config = HikariConfig("/hikari.properties")
+    config.schema = "public"
     val ds = HikariDataSource(config)
     Database.connect(ds)
-
 }
