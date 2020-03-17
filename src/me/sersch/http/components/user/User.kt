@@ -1,16 +1,16 @@
 package me.sersch.http.components.user
 
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import java.util.*
 
-data class User(
-    val id: EntityID<Int>,
-    val firstName: String,
-    val lastName: String,
-    val mail: String,
-    val hash: String
-)
+import org.jetbrains.exposed.dao.id.EntityID
+
+class User(
+    val id: Int,
+    override val firstName: String,
+    override val lastName: String,
+    override val mail: String,
+    val hash: String,
+    override val role: Int
+): UserInterface
 
