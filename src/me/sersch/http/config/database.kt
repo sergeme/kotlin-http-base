@@ -5,8 +5,8 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 
 fun initDB() {
-    val config = HikariConfig("/hikari.properties")
-    config.schema = "public"
-    val ds = HikariDataSource(config)
-    Database.connect(ds)
+    val hikariConfig = HikariConfig("/hikari.properties")
+    hikariConfig.schema = "public"
+    val dataSource = HikariDataSource(hikariConfig)
+    Database.connect(dataSource)
 }

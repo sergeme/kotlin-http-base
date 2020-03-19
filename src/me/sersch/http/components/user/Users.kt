@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.intLiteral
 
 object Users : Table() {
     val id: Column<Int> = integer("id").autoIncrement()
-    override val primaryKey = PrimaryKey(id, name="primaryKey")
+    override val primaryKey = PrimaryKey(id, name = "primaryKey")
     val firstname = varchar("firstname", 50)
     val lastname = varchar("lastname", 50)
     val mail = varchar("mail", 50)

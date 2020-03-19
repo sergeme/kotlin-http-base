@@ -1,9 +1,10 @@
 package me.sersch.http.components.user
 
+//Class used to receive requests
 data class UserDTO(
-    override val firstName: String,
-    override val lastName: String,
-    override val mail: String,
+    val firstName: String,
+    val lastName: String,
+    val mail: String,
     val hash: String,
-    override val role: Int
-) : UserInterface
+    val role: Int
+)

@@ -1,23 +1,17 @@
 package me.sersch.http.components.user
 
-import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.Application
 import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.auth.Authentication
+import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.authenticate
-import io.ktor.features.CORS
-import io.ktor.features.ContentNegotiation
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
+import io.ktor.auth.principal
 import io.ktor.http.HttpStatusCode
-import io.ktor.jackson.jackson
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
-import org.jetbrains.exposed.dao.id.EntityID
+import me.sersch.http.services.auth.AuthController
 
-fun Application.userRoutes(userController: UserController) {
+fun Application.userRoutes(userController: UserController, authController: AuthController) {
     routing {
         //Routes requiring authentication
         authenticate {
@@ -26,21 +20,31 @@ fun Application.userRoutes(userController: UserController) {
             }
 
             get("/user/{id}") {
-                val id = call.parameters["id"]?.toInt()!!
-                call.respond(userController.getOne(id))
+                val userId = call.parameters["id"]?.toInt()!!
+                call.respond(userController.getOne(userId))
             }
 
             put("/user/{id}") {
-                val id = call.parameters["id"]?.toInt()!!
-                val userDTO = call.receive<UserDTO>()
-                userController.update(userDTO, id)
-                call.respond(HttpStatusCode.OK)
+                val userId = call.parameters["id"]?.toInt()!!
+                val principal = call.principal<UserIdPrincipal>() ?: error("No principal")
+                //Only allow access to admins or the user itself
+                if (authController.isAdminOrSelectedUser(principal, userId)) {
+                    val id = call.parameters["id"]?.toInt()!!
+                    val userDTO = call.receive<UserDTO>()
+                    userController.update(userDTO, id)
+                    call.respond(HttpStatusCode.OK)
+                } else {
+                    call.respond(HttpStatusCode.Forbidden)
+                }
             }
 
             delete("/user/{id}") {
-                val id = call.parameters["id"]?.toInt()!!
-                userController.delete(id)
-                call.respond(HttpStatusCode.OK)
+                val userId = call.parameters["id"]?.toInt()!!
+                val principal = call.principal<UserIdPrincipal>() ?: error("No principal")
+                println(principal.name)
+                if (authController.isAdminOrSelectedUser(principal, userId)) {
+                    call.respond(userController.delete(userId))
+                }
             }
         }
 
