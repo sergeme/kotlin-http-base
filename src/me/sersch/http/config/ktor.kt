@@ -31,6 +31,7 @@ fun Application.installFeatures(authController: AuthController) {
 
     install(Authentication) {
         jwt {
+            //probably should move value from controller
             verifier(authController.verifier)
             validate {
                 UserIdPrincipal(it.payload.getClaim("name").asString())
@@ -47,6 +48,6 @@ fun Application.installFeatures(authController: AuthController) {
 
 //Ktor enabling routes and requirements
 fun Application.enableRoutes(userController: UserController, authController: AuthController) {
-    userRoutes(userController, authController)
-    authRoute(userController, authController)
+    userRoutes(userController)
+    authRoute(authController)
 }

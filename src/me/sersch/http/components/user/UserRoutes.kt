@@ -9,50 +9,64 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
-import me.sersch.http.services.auth.AuthController
+import java.lang.Exception
 
-fun Application.userRoutes(userController: UserController, authController: AuthController) {
+fun Application.userRoutes(userController: UserController) {
     routing {
         //Routes requiring authentication
         authenticate {
             get("/users") {
-                call.respond(userController.getAll())
+                try {
+                    val users = userController.getAll()
+                    call.respond(users.responseCode, users.responseObject)
+                } catch(e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest, "${e.message}")
+                }
             }
 
             get("/user/{id}") {
-                val userId = call.parameters["id"]?.toInt()!!
-                call.respond(userController.getOne(userId))
+                try {
+                    val userId = call.parameters["id"]?.toInt()!!
+                    val user = userController.getOne(userId)
+                    call.respond(user.responseCode, user.responseObject)
+                } catch(e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest, "${e.message}")
+                }
             }
 
             put("/user/{id}") {
-                val userId = call.parameters["id"]?.toInt()!!
-                val principal = call.principal<UserIdPrincipal>() ?: error("No principal")
-                //Only allow access to admins or the user itself
-                if (authController.isAdminOrSelectedUser(principal, userId)) {
+                try {
+                    val principal = call.principal<UserIdPrincipal>() ?: error("No principal")
                     val id = call.parameters["id"]?.toInt()!!
                     val userDTO = call.receive<UserDTO>()
-                    userController.update(userDTO, id)
-                    call.respond(HttpStatusCode.OK)
-                } else {
-                    call.respond(HttpStatusCode.Forbidden)
+                    val response = userController.update(userDTO, id, principal)
+                    call.respond(response.responseCode, response.responseObject)
+                } catch(e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest, "${e.message}")
                 }
             }
 
             delete("/user/{id}") {
-                val userId = call.parameters["id"]?.toInt()!!
-                val principal = call.principal<UserIdPrincipal>() ?: error("No principal")
-                println(principal.name)
-                if (authController.isAdminOrSelectedUser(principal, userId)) {
-                    call.respond(userController.delete(userId))
+                try {
+                    val userId = call.parameters["id"]?.toInt()!!
+                    val principal = call.principal<UserIdPrincipal>() ?: error("No principal")
+                    val response = userController.delete(userId, principal)
+                    call.respond(response.responseCode, response.responseCode)
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest, "${e.message}")
                 }
             }
         }
 
         //Public Routes
         post("/user") {
-            val userDto = call.receive<UserDTO>()
-            userController.insert(userDto)
-            call.respond(HttpStatusCode.Created)
+            try {
+                val userDTO = call.receive<UserDTO>()
+                userController.insert(userDTO)
+                call.respond(HttpStatusCode.Created)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.BadRequest, "${e.message}")
+            }
         }
     }
 }

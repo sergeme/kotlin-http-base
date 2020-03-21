@@ -1,3 +1,3 @@
 package me.sersch.http.services.auth
-
-class AuthPayload(val userName: String, val password: String)
+//Class for receiving authentication requests.
+data class AuthPayload(val userName: String, val password: String)

@@ -14,7 +14,7 @@ apply plugin: 'kotlin'
 apply plugin: 'application'
 
 group 'me.sersch.http'
-version '1.0.0'
+version '1.0.0-FINAL'
 mainClassName = "io.ktor.server.netty.EngineMain"
 
 sourceSets {
